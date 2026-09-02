@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f7fb" />
+    <title>MiniHub</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="brand-line">
+            <span class="brand-mark">PH</span>
+            <span>MiniHub</span>
+          </div>
+          <p class="muted">个人项目工作台</p>
+        </div>
+        <div class="topbar-actions">
+          <span class="preview-badge"><span class="status-dot status-dot--blue"></span>本地预览</span>
+          <button class="icon-button" type="button" data-refresh title="刷新工作台" aria-label="刷新工作台">↻</button>
+          <button class="secondary-button settings-button" type="button" data-settings title="工作台设置" aria-label="工作台设置"><span>⚙</span><span>设置</span></button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="project-sidebar">
+          <div class="sidebar-heading">
+            <div>
+              <span class="section-kicker">PROJECTS</span>
+              <h1>我的项目</h1>
+            </div>
+            <span class="project-count" id="projectCount">7</span>
+          </div>
+          <nav id="projectList" class="project-list" aria-label="项目列表"></nav>
+          <div class="sidebar-footer">
+            <span class="status-dot status-dot--green"></span>
+            <span>工作台已就绪</span>
+          </div>
+        </aside>
+
+        <section class="content-pane">
+          <div class="content-toolbar">
+            <div>
+              <div class="breadcrumb"><span>工作台</span><span>/</span><strong id="currentProjectName">TagTime</strong></div>
+              <div class="project-heading">
+                <div id="currentProjectIcon" class="project-icon project-icon--large">T</div>
+                <div>
+                  <div class="heading-row">
+                    <h2 id="currentProjectTitle">TagTime</h2>
+                    <span id="currentProjectStatus" class="status-pill status-pill--green">运行正常</span>
+                  </div>
+                  <p id="currentProjectDescription" class="muted">标签时间、日记、笔记与日历</p>
+                </div>
+              </div>
+            </div>
+            <div class="toolbar-actions">
+              <a id="projectDirectLink" class="secondary-button" href="https://tag.812264226.xyz/" target="_blank" rel="noreferrer">
+                <span>↗</span><span>打开原项目</span>
+              </a>
+              <button class="secondary-button" type="button" data-reset>恢复默认</button>
+              <button class="primary-button" type="button" data-toggle-edit><span>✎</span><span>编辑布局</span></button>
+            </div>
+          </div>
+
+          <div id="editBar" class="edit-bar" hidden>
+            <div><strong>正在编辑布局</strong><span>拖动模块移动，拖动右下角调整大小</span></div>
+            <div class="edit-actions">
+              <button class="secondary-button" type="button" data-cancel>取消</button>
+              <button class="primary-button" type="button" data-save>保存布局</button>
+            </div>
+          </div>
+
+          <div id="gridCanvas" class="grid-canvas" aria-live="polite"></div>
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsTitle">
+      <form id="settingsForm" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <span class="section-kicker">SETTINGS</span>
+            <h2 id="settingsTitle">工作台设置</h2>
+          </div>
+          <button class="icon-button" type="button" data-settings-close title="关闭设置" aria-label="关闭设置">×</button>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section__title">
+            <div class="project-icon project-icon--alist">A</div>
+            <div>
+              <strong>连接 Alist WebDAV</strong>
+              <p class="muted">浏览网盘目录和文件</p>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <div class="settings-field settings-field--full">
+              <label class="field-label" for="webdavUrl">WebDAV 地址</label>
+              <input id="webdavUrl" class="text-input" type="url" autocomplete="url" spellcheck="false" placeholder="http://localhost:5244/dav/" />
+            </div>
+            <div class="settings-field">
+              <label class="field-label" for="webdavUsername">用户名</label>
+              <input id="webdavUsername" class="text-input" type="text" autocomplete="username" spellcheck="false" placeholder="Alist 用户名" />
+            </div>
+            <div class="settings-field">
+              <label class="field-label" for="webdavPassword">密码</label>
+              <input id="webdavPassword" class="text-input" type="password" autocomplete="current-password" spellcheck="false" placeholder="Alist 密码" />
+            </div>
+          </div>
+          <label class="checkbox-row" for="webdavRemember">
+            <input id="webdavRemember" type="checkbox" />
+            <span>记住登录信息</span>
+          </label>
+          <p class="field-help">勾选后保存在当前浏览器；不勾选则刷新页面后清除。</p>
+          <p id="alistSettingsStatus" class="dialog-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-settings-clear>清除连接</button>
+          <span></span>
+          <button class="secondary-button" type="button" data-settings-close>取消</button>
+          <button class="primary-button" type="submit" data-settings-connect>连接 WebDAV</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="webdavNameDialog" class="settings-dialog" aria-labelledby="webdavNameTitle">
+      <form id="webdavNameForm" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <span class="section-kicker">WEBDAV</span>
+          <h2 id="webdavNameTitle">新建文件夹</h2>
+          </div>
+          <button class="icon-button" type="button" data-webdav-name-close title="关闭" aria-label="关闭">×</button>
+        </div>
+        <div class="settings-section">
+          <label id="webdavNameLabel" class="field-label" for="webdavNameInput">名称</label>
+          <input id="webdavNameInput" class="text-input" type="text" autocomplete="off" spellcheck="false" placeholder="输入名称" />
+          <p id="webdavNameStatus" class="dialog-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="dialog-actions">
+          <span></span>
+          <button class="secondary-button" type="button" data-webdav-name-close>取消</button>
+          <button id="webdavNameSubmit" class="primary-button" type="submit">创建</button>
+        </div>
+      </form>
+    </dialog>
+    <input id="webdavUploadInput" type="file" hidden />
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
